@@ -11,7 +11,7 @@ setuptools.setup(
     description="Calculate signed distance fields for arbitrary meshes",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/marian42/mesh_to_sdf",
+    url="https://github.com/shutengW/mesh_to_sdf",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
