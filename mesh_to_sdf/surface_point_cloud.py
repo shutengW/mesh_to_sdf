@@ -103,6 +103,34 @@ class SurfacePointCloud:
         else:
             return voxels
 
+    def noisy_shape(self, number_of_points=500000, use_scans=True, sign_method='normal', normal_sample_count=11, min_size=0, return_gradients=False):
+        query_points = []
+        surface_sample_count = int(number_of_points) // 2
+        surface_points = self.get_random_surface_points(surface_sample_count, use_scans=use_scans)
+        query_points.append(surface_points + np.random.normal(scale=0.0025, size=(surface_sample_count, 3)))
+        query_points.append(surface_points + np.random.normal(scale=0.00025, size=(surface_sample_count, 3)))
+        
+        query_points = np.concatenate(query_points).astype(np.float32)
+
+        if sign_method == 'normal':
+            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=False, sample_count=normal_sample_count, return_gradients=return_gradients)
+        elif sign_method == 'depth':
+            sdf = self.get_sdf_in_batches(query_points, use_depth_buffer=True, return_gradients=return_gradients)
+        else:
+            raise ValueError('Unknown sign determination method: {:s}'.format(sign_method))
+        if return_gradients:
+            sdf, gradients = sdf
+
+        if min_size > 0:
+            model_size = np.count_nonzero(sdf[-unit_sphere_sample_count:] < 0) / unit_sphere_sample_count
+            if model_size < min_size:
+                raise BadMeshException()
+
+        if return_gradients:
+            return query_points, sdf, gradients
+        else:
+            return query_points, sdf
+            
     def sample_sdf_near_surface(self, number_of_points=500000, use_scans=True, sign_method='normal', normal_sample_count=11, min_size=0, return_gradients=False):
         query_points = []
         surface_sample_count = int(number_of_points * 47 / 50) // 2
