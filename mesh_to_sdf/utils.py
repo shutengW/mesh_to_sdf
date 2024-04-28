@@ -4,7 +4,7 @@ import numpy as np
 
 def scale_to_unit_sphere(mesh):
     if isinstance(mesh, trimesh.Scene):
-        mesh = np.array(mesh.dump()).sum()
+        mesh = mesh.dump().sum()
 
     vertices = mesh.vertices - mesh.bounding_box.centroid
     distances = np.linalg.norm(vertices, axis=1)
@@ -14,7 +14,7 @@ def scale_to_unit_sphere(mesh):
 
 def scale_to_unit_cube(mesh):
     if isinstance(mesh, trimesh.Scene):
-        mesh = np.array(mesh.dump()).sum()
+        mesh = mesh.dump().sum()
 
     vertices = mesh.vertices - mesh.bounding_box.centroid
     vertices *= 2 / np.max(mesh.bounding_box.extents)
